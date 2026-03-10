@@ -1,0 +1,2 @@
+Handling and analysing databases like Cassandra, hive, and mongo db 
+

@@ -1,0 +1,153 @@
+26/03/10 18:57:29 WARN Utils: Your hostname, LAPTOP-5KS3L9TC resolves to a loopback address: 127.0.1.1; using 10.255.255.254 instead (on interface lo)
+26/03/10 18:57:29 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+26/03/10 18:57:31 INFO SparkContext: Running Spark version 3.4.2
+26/03/10 18:57:31 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+26/03/10 18:57:31 INFO ResourceUtils: ==============================================================
+26/03/10 18:57:31 INFO ResourceUtils: No custom resources configured for spark.driver.
+26/03/10 18:57:31 INFO ResourceUtils: ==============================================================
+26/03/10 18:57:31 INFO SparkContext: Submitted application: MovieRecommendationSystem
+26/03/10 18:57:31 INFO ResourceProfile: Default ResourceProfile created, executor resources: Map(cores -> name: cores, amount: 1, script: , vendor: , memory -> name: memory, amount: 1024, script: , vendor: , offHeap -> name: offHeap, amount: 0, script: , vendor: ), task resources: Map(cpus -> name: cpus, amount: 1.0)
+26/03/10 18:57:31 INFO ResourceProfile: Limiting resource is cpu
+26/03/10 18:57:31 INFO ResourceProfileManager: Added ResourceProfile id: 0
+26/03/10 18:57:31 INFO SecurityManager: Changing view acls to: harsh
+26/03/10 18:57:31 INFO SecurityManager: Changing modify acls to: harsh
+26/03/10 18:57:31 INFO SecurityManager: Changing view acls groups to: 
+26/03/10 18:57:31 INFO SecurityManager: Changing modify acls groups to: 
+26/03/10 18:57:31 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users with view permissions: harsh; groups with view permissions: EMPTY; users with modify permissions: harsh; groups with modify permissions: EMPTY
+26/03/10 18:57:31 INFO Utils: Successfully started service 'sparkDriver' on port 38717.
+26/03/10 18:57:31 INFO SparkEnv: Registering MapOutputTracker
+26/03/10 18:57:31 INFO SparkEnv: Registering BlockManagerMaster
+26/03/10 18:57:31 INFO BlockManagerMasterEndpoint: Using org.apache.spark.storage.DefaultTopologyMapper for getting topology information
+26/03/10 18:57:31 INFO BlockManagerMasterEndpoint: BlockManagerMasterEndpoint up
+26/03/10 18:57:31 INFO SparkEnv: Registering BlockManagerMasterHeartbeat
+26/03/10 18:57:32 INFO DiskBlockManager: Created local directory at /tmp/blockmgr-3d2f1a41-83ea-4228-b891-9ea4d0c0ff2b
+26/03/10 18:57:32 INFO MemoryStore: MemoryStore started with capacity 366.3 MiB
+26/03/10 18:57:32 INFO SparkEnv: Registering OutputCommitCoordinator
+26/03/10 18:57:32 INFO JettyUtils: Start Jetty 0.0.0.0:4040 for SparkUI
+26/03/10 18:57:32 INFO Utils: Successfully started service 'SparkUI' on port 4040.
+26/03/10 18:57:32 INFO SparkContext: Added JAR file:/home/harsh/BDA%20Labs/Lab%20-%2006/MovieRecommendation.jar at spark://10.255.255.254:38717/jars/MovieRecommendation.jar with timestamp 1773169051247
+26/03/10 18:57:32 INFO Executor: Starting executor ID driver on host 10.255.255.254
+26/03/10 18:57:32 INFO Executor: Starting executor with user classpath (userClassPathFirst = false): ''
+26/03/10 18:57:32 INFO Executor: Fetching spark://10.255.255.254:38717/jars/MovieRecommendation.jar with timestamp 1773169051247
+26/03/10 18:57:32 INFO TransportClientFactory: Successfully created connection to /10.255.255.254:38717 after 33 ms (0 ms spent in bootstraps)
+26/03/10 18:57:32 INFO Utils: Fetching spark://10.255.255.254:38717/jars/MovieRecommendation.jar to /tmp/spark-8adb6ce6-eaf2-4390-ac05-ebca821f1f09/userFiles-86bf2f81-abb8-4838-959d-8eef341a4cd7/fetchFileTemp3307292960791832409.tmp
+26/03/10 18:57:32 INFO Executor: Adding file:/tmp/spark-8adb6ce6-eaf2-4390-ac05-ebca821f1f09/userFiles-86bf2f81-abb8-4838-959d-8eef341a4cd7/MovieRecommendation.jar to class loader
+26/03/10 18:57:32 INFO Utils: Successfully started service 'org.apache.spark.network.netty.NettyBlockTransferService' on port 40175.
+26/03/10 18:57:32 INFO NettyBlockTransferService: Server created on 10.255.255.254:40175
+26/03/10 18:57:32 INFO BlockManager: Using org.apache.spark.storage.RandomBlockReplicationPolicy for block replication policy
+26/03/10 18:57:32 INFO BlockManagerMaster: Registering BlockManager BlockManagerId(driver, 10.255.255.254, 40175, None)
+26/03/10 18:57:32 INFO BlockManagerMasterEndpoint: Registering block manager 10.255.255.254:40175 with 366.3 MiB RAM, BlockManagerId(driver, 10.255.255.254, 40175, None)
+26/03/10 18:57:32 INFO BlockManagerMaster: Registered BlockManager BlockManagerId(driver, 10.255.255.254, 40175, None)
+26/03/10 18:57:32 INFO BlockManager: Initialized BlockManager: BlockManagerId(driver, 10.255.255.254, 40175, None)
+============================================================
+  Movie Recommendation System using Spark MLlib ALS
+============================================================
+Input Path  : hdfs://localhost:9000/user/student/input/ratings.csv
+Output Path : hdfs://localhost:9000/user/student/output/recommendations
+
+--- Dataset Statistics ---
+Total Ratings : 240
+Total Users   : 12
+Total Movies  : 38
+
+--- Sample Ratings Data ---
++------+-------+------+---------+
+|userId|movieId|rating|timestamp|
++------+-------+------+---------+
+|     1|      1|   4.0|964982703|
+|     1|      3|   4.0|964981247|
+|     1|      6|   4.0|964982224|
+|     1|     47|   5.0|964983815|
+|     1|     50|   5.0|964982931|
+|     1|     70|   3.0|964982400|
+|     1|    101|   5.0|964980868|
+|     1|    110|   4.0|964982176|
+|     1|    151|   5.0|964984041|
+|     1|    157|   5.0|964984100|
++------+-------+------+---------+
+only showing top 10 rows
+
+Training set size : 205
+Test set size     : 35
+
+--- Training ALS Model ---
+Parameters:
+  Max Iterations    : 10
+  Regularization    : 0.1
+  Rank (factors)    : 10
+  Cold Start Strategy: drop
+
+--- Sample Predictions vs Actual ---
++------+-------+------+----------+
+|userId|movieId|rating|prediction|
++------+-------+------+----------+
+|    12|     10|   3.0| 2.9171417|
+|     1|      6|   4.0|  3.998726|
+|     1|    101|   5.0|  3.741955|
+|     1|    151|   5.0|  4.339123|
+|     1|    231|   5.0| 3.8700762|
+|     1|    349|   4.0| 3.5753968|
+|     6|      1|   3.0|   3.12897|
+|     6|    144|   2.5|  2.752714|
+|     6|    208|   3.0| 2.7522488|
+|     6|    231|   3.5|  3.518758|
++------+-------+------+----------+
+only showing top 10 rows
+
+============================================================
+  Model Evaluation
+============================================================
+  Root Mean Squared Error (RMSE) = 0.5522
+  (Lower RMSE indicates better prediction accuracy)
+============================================================
+
+--- Top 5 Movie Recommendations for Each User ---
++------+----------------------------------------------------------------------------------------+
+|userId|recommendations                                                                         |
++------+----------------------------------------------------------------------------------------+
+|10    |[{260, 4.669342}, {50, 4.6497946}, {318, 4.5406}, {17, 4.3166013}, {110, 4.2855625}]    |
+|1     |[{50, 4.921428}, {260, 4.898298}, {157, 4.871969}, {47, 4.733142}, {163, 4.6965933}]    |
+|11    |[{260, 4.946525}, {318, 4.844898}, {50, 4.816436}, {32, 4.687277}, {151, 4.62943}]      |
+|12    |[{50, 4.0640526}, {260, 4.0617776}, {318, 3.9285643}, {17, 3.7811275}, {110, 3.7281678}]|
+|2     |[{17, 4.724251}, {260, 4.5797753}, {318, 4.569078}, {296, 4.540338}, {110, 4.4364038}]  |
+|3     |[{260, 5.055265}, {318, 4.942538}, {17, 4.934791}, {110, 4.8679285}, {50, 4.8378315}]   |
+|4     |[{50, 4.6957707}, {318, 4.5868998}, {260, 4.4979486}, {34, 4.483361}, {17, 4.1416554}]  |
+|5     |[{260, 5.0349374}, {50, 4.9067616}, {318, 4.8845644}, {151, 4.8160205}, {32, 4.8114576}]|
+|6     |[{50, 4.4016404}, {260, 4.3534675}, {318, 4.161169}, {17, 4.130116}, {110, 3.9620545}]  |
+|7     |[{260, 5.119626}, {50, 5.1016207}, {318, 5.0958433}, {110, 4.7963877}, {157, 4.784104}] |
++------+----------------------------------------------------------------------------------------+
+only showing top 10 rows
+
+--- Top 5 User Recommendations for Each Movie ---
++-------+--------------------------------------------------------------------------------+
+|movieId|recommendations                                                                 |
++-------+--------------------------------------------------------------------------------+
+|10     |[{3, 4.084509}, {9, 3.8834105}, {7, 3.8247862}, {2, 3.8060508}, {11, 3.6853774}]|
+|50     |[{7, 5.1016207}, {9, 5.0683255}, {1, 4.921428}, {5, 4.9067616}, {3, 4.8378315}] |
+|70     |[{3, 3.2722776}, {7, 3.2567317}, {9, 3.1436899}, {2, 3.113582}, {6, 3.0504985}] |
+|110    |[{9, 4.891453}, {3, 4.8679285}, {7, 4.7963877}, {5, 4.706172}, {11, 4.6184225}] |
+|150    |[{3, 4.4509954}, {2, 4.3933554}, {7, 4.267787}, {9, 4.030796}, {11, 3.9301805}] |
+|260    |[{9, 5.185458}, {7, 5.119626}, {3, 5.055265}, {5, 5.0349374}, {11, 4.946525}]   |
+|101    |[{9, 4.290816}, {5, 4.1223254}, {7, 4.085189}, {3, 3.9784644}, {11, 3.9689972}] |
+|1      |[{9, 4.3034077}, {7, 4.122792}, {5, 4.0796204}, {3, 3.9491012}, {11, 3.9304361}]|
+|231    |[{9, 4.42392}, {7, 4.3945417}, {3, 4.259855}, {5, 4.2370996}, {11, 4.1727166}]  |
+|161    |[{3, 4.0241594}, {2, 3.8578699}, {7, 3.812032}, {9, 3.7159116}, {11, 3.6081872}]|
++-------+--------------------------------------------------------------------------------+
+only showing top 10 rows
+
+--- Results Saved to HDFS ---
+User Recommendations  : hdfs://localhost:9000/user/student/output/recommendations/user_recommendations
+Movie Recommendations : hdfs://localhost:9000/user/student/output/recommendations/movie_recommendations
+
+--- Recommendations for Specific Users ---
++------+----------------------------------------------------------------------------------------+
+|userId|recommendations                                                                         |
++------+----------------------------------------------------------------------------------------+
+|1     |[{50, 4.921428}, {260, 4.898298}, {157, 4.871969}, {47, 4.733142}, {163, 4.6965933}]    |
+|12    |[{50, 4.0640526}, {260, 4.0617776}, {318, 3.9285643}, {17, 3.7811275}, {110, 3.7281678}]|
+|6     |[{50, 4.4016404}, {260, 4.3534675}, {318, 4.161169}, {17, 4.130116}, {110, 3.9620545}]  |
++------+----------------------------------------------------------------------------------------+
+
+============================================================
+  Recommendation System completed successfully!
+============================================================

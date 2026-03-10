@@ -1,0 +1,12 @@
+Lab Activity 3 : 
+Task 1: Create Spark Session
+Task 2: Create and Process RDD (Resilient Distributed Dataset) 
+Task 3: Word Count using RDD
+Task 4 : Create DataFrame
+Task 5: DataFrame Operations
+Task 6 : CSV File Processing
+Task 7 : Activity 
+1.	Count number of students with marks > 75
+2.	Find average marks
+3.	Find maximum marks
+4.	Save result to CSV file

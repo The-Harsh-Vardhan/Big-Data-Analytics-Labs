@@ -1,0 +1,5 @@
+Lab Activity 2  Hadoop Map Reduce Program   
+a: Word Count Program, 
+b: Log File Analysis (Error Count), 
+c: Maximum Temperature per Year,  
+d: Customer Purchase Total

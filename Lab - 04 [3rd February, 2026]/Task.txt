@@ -1,0 +1,12 @@
+Lab Activity 5:
+Structured Streaming Programming
+
+Task 1: Create a Streaming DagaFrqng
+Task 2: Word Count on Streaming Data
+Task 3: Streaming with Files
+
+Read Streaming Data from Files
+Task 4: Event Count Aggregation
+Task 5: Windowed Aggregation
+Task 6: Watermarking
+Task 7: Write Streaming Output

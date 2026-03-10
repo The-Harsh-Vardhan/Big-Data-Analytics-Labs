@@ -1,0 +1,47 @@
+# Java compiled classes
+*.class
+
+# JAR files (can be rebuilt from source)
+*.jar
+
+# Spark / Hadoop build artifacts
+metastore_db/
+derby.log
+spark-warehouse/
+
+# Checkpoint directories
+checkpoint_*/
+
+# Spark output directories
+output_task*/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*~
+
+# Logs (keep clean_output.txt and output_log.txt as evidence)
+mongod.log
+
+# Large downloaded archives
+*.tar.gz
+*.tgz
+
+# Hadoop/Hive/MongoDB portable installs
+jdk8u432-b06/
+apache-hive-3.1.3-bin/
+mongodb-linux-*/
+mongosh-*/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# PDF files (syllabus/teaching plans — not code)
+*.pdf

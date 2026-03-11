@@ -3,11 +3,27 @@
 ============================================================
 Input Path  : hdfs://localhost:9000/user/student/input/ratings.csv
 Output Path : hdfs://localhost:9000/user/student/output/recommendations
+
+--- DataFrame Schema ---
+root
+ |-- userId: integer (nullable = false)
+ |-- movieId: integer (nullable = false)
+ |-- rating: float (nullable = false)
+ |-- timestamp: long (nullable = false)
+
 --- Dataset Statistics ---
 Total Ratings : 240
 Total Users   : 12
 Total Movies  : 38
---- Sample Ratings Data ---
+
+--- Rating Distribution Summary ---
++----------+----------+----------+-------+-----+
+|Min Rating|Max Rating|Avg Rating|Std Dev|Count|
++----------+----------+----------+-------+-----+
+|       2.0|       5.0|      3.94|   0.73|  240|
++----------+----------+----------+-------+-----+
+
+--- Sample Ratings Data (First 10 Rows) ---
 +------+-------+------+---------+
 |userId|movieId|rating|timestamp|
 +------+-------+------+---------+
@@ -23,6 +39,7 @@ Total Movies  : 38
 |     1|    157|   5.0|964984100|
 +------+-------+------+---------+
 only showing top 10 rows
+
 Training set size : 205
 Test set size     : 35
 --- Training ALS Model ---

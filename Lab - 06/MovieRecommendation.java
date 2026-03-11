@@ -53,6 +53,7 @@ import org.apache.spark.sql.types.StructField;
 import org.apache.spark.ml.recommendation.ALS;
 import org.apache.spark.ml.recommendation.ALSModel;
 import org.apache.spark.ml.evaluation.RegressionEvaluator;
+import static org.apache.spark.sql.functions.*;
 
 public class MovieRecommendation {
 
@@ -110,6 +111,12 @@ public class MovieRecommendation {
                 .schema(ratingsSchema)       // Apply our schema
                 .csv(inputPath);             // Read from HDFS path
 
+        // Display the schema of the loaded DataFrame
+        // printSchema() shows column names, data types, and nullability —
+        // this verifies that our explicit schema was applied correctly.
+        System.out.println("--- DataFrame Schema ---");
+        ratings.printSchema();
+
         // Display dataset statistics
         long totalRatings = ratings.count();
         long totalUsers = ratings.select("userId").distinct().count();
@@ -121,8 +128,19 @@ public class MovieRecommendation {
         System.out.println("Total Movies  : " + totalMovies);
         System.out.println();
 
+        // Show rating distribution summary — min, max, mean, stddev.
+        // This helps understand the data distribution before model training.
+        System.out.println("--- Rating Distribution Summary ---");
+        ratings.select(
+                min("rating").alias("Min Rating"),
+                max("rating").alias("Max Rating"),
+                round(avg("rating"), 2).alias("Avg Rating"),
+                round(stddev("rating"), 2).alias("Std Dev"),
+                count("rating").alias("Count")
+        ).show();
+
         // Show first 10 rows of the dataset
-        System.out.println("--- Sample Ratings Data ---");
+        System.out.println("--- Sample Ratings Data (First 10 Rows) ---");
         ratings.show(10);
 
         // =====================================================================

@@ -16,10 +16,15 @@
 7. [Expected Output](#7-expected-output)
 8. [Explanation of Code](#8-explanation-of-code)
 9. [Viva Questions & Answers](#9-viva-questions--answers)
+10. [Conclusion](#10-conclusion)
 
 ---
 
 ## 1. Overview
+
+**Aim:** To build a Movie Recommendation System using Apache Spark MLlib's ALS
+(Alternating Least Squares) collaborative filtering algorithm, with data stored
+on Hadoop HDFS.
 
 This lab implements a **Movie Recommendation System** using **Apache Spark MLlib's ALS
 (Alternating Least Squares)** algorithm. The system reads movie ratings from **Hadoop HDFS**,
@@ -30,7 +35,7 @@ movie recommendations for users.
 - **Apache Hadoop (HDFS):** Distributed storage for input/output data
 - **Apache Spark:** Distributed computing engine for processing
 - **Spark MLlib:** Machine learning library providing the ALS algorithm
-- **Java:** Programming language (as per requirement — no Python)
+- **Java:** Programming language (as per lab requirement — no Python)
 
 ---
 
@@ -114,12 +119,12 @@ Ensure the following are installed and running:
 | Apache Hadoop | 3.x | HDFS for distributed storage |
 | Apache Spark | 3.x | Distributed computing + MLlib |
 
-**Environment Variables Required:**
-```
-JAVA_HOME    = C:\java\jdk1.8.0_xxx  (or your JDK path)
-HADOOP_HOME  = C:\hadoop
-SPARK_HOME   = C:\spark
-PATH         = %JAVA_HOME%\bin;%HADOOP_HOME%\bin;%SPARK_HOME%\bin;%PATH%
+**Environment Variables Required (Linux):**
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64   # or your JDK path
+export HADOOP_HOME=/opt/hadoop
+export SPARK_HOME=/opt/spark
+export PATH=$JAVA_HOME/bin:$HADOOP_HOME/bin:$SPARK_HOME/bin:$PATH
 ```
 
 ---
@@ -129,7 +134,11 @@ PATH         = %JAVA_HOME%\bin;%HADOOP_HOME%\bin;%SPARK_HOME%\bin;%PATH%
 ```
 Lab - 06/
 ├── MovieRecommendation.java   # Main Java source code
-├── ratings.csv                # Sample movie ratings dataset
+├── MovieRecommendation.jar    # Compiled JAR for spark-submit
+├── ratings.csv                # Sample movie ratings dataset (240 ratings)
+├── clean_output.txt           # Clean program output (without Spark logs)
+├── output_log.txt             # Full run log (with Spark INFO messages)
+├── hdfs_results.txt           # HDFS JSON output (user & movie recommendations)
 ├── README.md                  # This documentation file
 └── Task.txt                   # Lab task description
 ```
@@ -159,7 +168,7 @@ userId,movieId,rating,timestamp
 2,10,4.0,1141391880
 ```
 
-The sample dataset contains **12 users**, **~20 movies**, and **~220 ratings**.
+The sample dataset contains **12 users**, **38 movies**, and **240 ratings**.
 
 > **Note:** For larger experiments, download the MovieLens dataset from
 > https://grouplens.org/datasets/movielens/ (ml-latest-small has 100K ratings).
@@ -172,26 +181,26 @@ The sample dataset contains **12 users**, **~20 movies**, and **~220 ratings**.
 
 Open a terminal and start HDFS:
 
-```cmd
-cd %HADOOP_HOME%\sbin
-start-dfs.cmd
+```bash
+cd $HADOOP_HOME/sbin
+./start-dfs.sh
 ```
 
 Verify Hadoop is running:
-```cmd
+```bash
 jps
 ```
 Expected output should show: `NameNode`, `DataNode`, `SecondaryNameNode`
 
 ### Step 2: Create HDFS Directories and Upload Dataset
 
-```cmd
+```bash
 hdfs dfs -mkdir -p /user/student/input
 hdfs dfs -put ratings.csv /user/student/input/
 ```
 
 Verify the upload:
-```cmd
+```bash
 hdfs dfs -ls /user/student/input/
 hdfs dfs -head /user/student/input/ratings.csv
 ```
@@ -200,32 +209,32 @@ hdfs dfs -head /user/student/input/ratings.csv
 
 Navigate to the Lab-06 directory:
 
-```cmd
+```bash
 cd "Lab - 06"
 ```
 
 Compile using Spark JARs in the classpath:
 
-```cmd
-javac -cp "%SPARK_HOME%\jars\*" MovieRecommendation.java
+```bash
+javac -cp "$SPARK_HOME/jars/*" MovieRecommendation.java
 ```
 
 This produces `MovieRecommendation.class`.
 
 ### Step 4: Create a JAR File
 
-```cmd
+```bash
 jar cf MovieRecommendation.jar MovieRecommendation*.class
 ```
 
 ### Step 5: Run the Program using spark-submit
 
-```cmd
-spark-submit ^
-  --class MovieRecommendation ^
-  --master local[*] ^
-  MovieRecommendation.jar ^
-  hdfs://localhost:9000/user/student/input/ratings.csv ^
+```bash
+spark-submit \
+  --class MovieRecommendation \
+  --master local[*] \
+  MovieRecommendation.jar \
+  hdfs://localhost:9000/user/student/input/ratings.csv \
   hdfs://localhost:9000/user/student/output/recommendations
 ```
 
@@ -239,7 +248,7 @@ spark-submit ^
 
 ### Step 6: View Results on HDFS
 
-```cmd
+```bash
 hdfs dfs -ls /user/student/output/recommendations/
 hdfs dfs -cat /user/student/output/recommendations/user_recommendations/part-*.json | head
 hdfs dfs -cat /user/student/output/recommendations/movie_recommendations/part-*.json | head
@@ -249,18 +258,20 @@ hdfs dfs -cat /user/student/output/recommendations/movie_recommendations/part-*.
 
 If HDFS is not available, you can use local paths:
 
-```cmd
-spark-submit ^
-  --class MovieRecommendation ^
-  --master local[*] ^
-  MovieRecommendation.jar ^
-  file:///path/to/ratings.csv ^
+```bash
+spark-submit \
+  --class MovieRecommendation \
+  --master local[*] \
+  MovieRecommendation.jar \
+  file:///path/to/ratings.csv \
   file:///path/to/output
 ```
 
 ---
 
 ## 7. Expected Output
+
+The following is the actual output from running the program:
 
 ```
 ============================================================
@@ -269,24 +280,44 @@ spark-submit ^
 Input Path  : hdfs://localhost:9000/user/student/input/ratings.csv
 Output Path : hdfs://localhost:9000/user/student/output/recommendations
 
+--- DataFrame Schema ---
+root
+ |-- userId: integer (nullable = false)
+ |-- movieId: integer (nullable = false)
+ |-- rating: float (nullable = false)
+ |-- timestamp: long (nullable = false)
+
 --- Dataset Statistics ---
-Total Ratings : 220
+Total Ratings : 240
 Total Users   : 12
-Total Movies  : 22
+Total Movies  : 38
 
---- Sample Ratings Data ---
-+------+-------+------+----------+
-|userId|movieId|rating| timestamp|
-+------+-------+------+----------+
-|     1|      1|   4.0| 964982703|
-|     1|      3|   4.0| 964981247|
-|     1|      6|   4.0| 964982224|
-|     1|     47|   5.0| 964983815|
-|     1|     50|   5.0| 964982931|
-+------+-------+------+----------+
+--- Rating Distribution Summary ---
++----------+----------+----------+-------+-----+
+|Min Rating|Max Rating|Avg Rating|Std Dev|Count|
++----------+----------+----------+-------+-----+
+|       2.0|       5.0|      3.94|   0.73|  240|
++----------+----------+----------+-------+-----+
 
-Training set size : ~176
-Test set size     : ~44
+--- Sample Ratings Data (First 10 Rows) ---
++------+-------+------+---------+
+|userId|movieId|rating|timestamp|
++------+-------+------+---------+
+|     1|      1|   4.0|964982703|
+|     1|      3|   4.0|964981247|
+|     1|      6|   4.0|964982224|
+|     1|     47|   5.0|964983815|
+|     1|     50|   5.0|964982931|
+|     1|     70|   3.0|964982400|
+|     1|    101|   5.0|964980868|
+|     1|    110|   4.0|964982176|
+|     1|    151|   5.0|964984041|
+|     1|    157|   5.0|964984100|
++------+-------+------+---------+
+only showing top 10 rows
+
+Training set size : 205
+Test set size     : 35
 
 --- Training ALS Model ---
 Parameters:
@@ -299,34 +330,75 @@ Parameters:
 +------+-------+------+----------+
 |userId|movieId|rating|prediction|
 +------+-------+------+----------+
-|     1|    296|   3.0|  3.241...|
-|     2|    318|   4.5|  4.312...|
-|     ...                        |
+|    12|     10|   3.0| 2.9171417|
+|     1|      6|   4.0|  3.998726|
+|     1|    101|   5.0|  3.741955|
+|     1|    151|   5.0|  4.339123|
+|     1|    231|   5.0| 3.8700762|
+|     1|    349|   4.0| 3.5753968|
+|     6|      1|   3.0|   3.12897|
+|     6|    144|   2.5|  2.752714|
+|     6|    208|   3.0| 2.7522488|
+|     6|    231|   3.5|  3.518758|
 +------+-------+------+----------+
+only showing top 10 rows
 
 ============================================================
   Model Evaluation
 ============================================================
-  Root Mean Squared Error (RMSE) = 0.XXXX
+  Root Mean Squared Error (RMSE) = 0.5522
   (Lower RMSE indicates better prediction accuracy)
 ============================================================
 
 --- Top 5 Movie Recommendations for Each User ---
-+------+------------------------------------------+
-|userId|recommendations                           |
-+------+------------------------------------------+
-|     1|[{318, 4.95}, {32, 4.88}, ...]            |
-|     2|[{318, 4.72}, {32, 4.65}, ...]            |
-+------+------------------------------------------+
++------+----------------------------------------------------------------------------------------+
+|userId|recommendations                                                                         |
++------+----------------------------------------------------------------------------------------+
+|10    |[{260, 4.669342}, {50, 4.6497946}, {318, 4.5406}, {17, 4.3166013}, {110, 4.2855625}]    |
+|1     |[{50, 4.921428}, {260, 4.898298}, {157, 4.871969}, {47, 4.733142}, {163, 4.6965933}]    |
+|11    |[{260, 4.946525}, {318, 4.844898}, {50, 4.816436}, {32, 4.687277}, {151, 4.62943}]      |
+|12    |[{50, 4.0640526}, {260, 4.0617776}, {318, 3.9285643}, {17, 3.7811275}, {110, 3.7281678}]|
+|2     |[{17, 4.724251}, {260, 4.5797753}, {318, 4.569078}, {296, 4.540338}, {110, 4.4364038}]  |
++------+----------------------------------------------------------------------------------------+
+only showing top 5 rows
+
+--- Top 5 User Recommendations for Each Movie ---
++-------+--------------------------------------------------------------------------------+
+|movieId|recommendations                                                                 |
++-------+--------------------------------------------------------------------------------+
+|10     |[{3, 4.084509}, {9, 3.8834105}, {7, 3.8247862}, {2, 3.8060508}, {11, 3.6853774}]|
+|50     |[{7, 5.1016207}, {9, 5.0683255}, {1, 4.921428}, {5, 4.9067616}, {3, 4.8378315}] |
+|70     |[{3, 3.2722776}, {7, 3.2567317}, {9, 3.1436899}, {2, 3.113582}, {6, 3.0504985}] |
+|110    |[{9, 4.891453}, {3, 4.8679285}, {7, 4.7963877}, {5, 4.706172}, {11, 4.6184225}] |
+|150    |[{3, 4.4509954}, {2, 4.3933554}, {7, 4.267787}, {9, 4.030796}, {11, 3.9301805}] |
++-------+--------------------------------------------------------------------------------+
+only showing top 5 rows
 
 --- Results Saved to HDFS ---
-User Recommendations  : hdfs://.../user_recommendations
-Movie Recommendations : hdfs://.../movie_recommendations
+User Recommendations  : hdfs://localhost:9000/user/student/output/recommendations/user_recommendations
+Movie Recommendations : hdfs://localhost:9000/user/student/output/recommendations/movie_recommendations
+
+--- Recommendations for Specific Users ---
++------+----------------------------------------------------------------------------------------+
+|userId|recommendations                                                                         |
++------+----------------------------------------------------------------------------------------+
+|1     |[{50, 4.921428}, {260, 4.898298}, {157, 4.871969}, {47, 4.733142}, {163, 4.6965933}]    |
+|12    |[{50, 4.0640526}, {260, 4.0617776}, {318, 3.9285643}, {17, 3.7811275}, {110, 3.7281678}]|
+|6     |[{50, 4.4016404}, {260, 4.3534675}, {318, 4.161169}, {17, 4.130116}, {110, 3.9620545}]  |
++------+----------------------------------------------------------------------------------------+
 
 ============================================================
   Recommendation System completed successfully!
 ============================================================
 ```
+
+**Output Interpretation:**
+- The model achieves an **RMSE of 0.5522**, meaning predictions are off by only ~0.55
+  on a 1–5 rating scale — indicating strong prediction accuracy.
+- Movies **260** and **50** consistently appear in top recommendations, suggesting
+  these are high-quality movies with strong latent features.
+- The predictions closely match actual ratings (e.g., userId=1, movieId=6:
+  actual=4.0, predicted=3.999).
 
 ---
 
@@ -463,21 +535,42 @@ movieRecs.write().mode("overwrite").json(movieRecsPath);
 
 ```bash
 # Start Hadoop
-start-dfs.cmd
+$HADOOP_HOME/sbin/start-dfs.sh
 
 # Upload data to HDFS
 hdfs dfs -mkdir -p /user/student/input
 hdfs dfs -put ratings.csv /user/student/input/
 
 # Compile
-javac -cp "%SPARK_HOME%\jars\*" MovieRecommendation.java
+javac -cp "$SPARK_HOME/jars/*" MovieRecommendation.java
 
 # Package
 jar cf MovieRecommendation.jar MovieRecommendation*.class
 
 # Run
-spark-submit --class MovieRecommendation --master local[*] MovieRecommendation.jar hdfs://localhost:9000/user/student/input/ratings.csv hdfs://localhost:9000/user/student/output/recommendations
+spark-submit --class MovieRecommendation --master local[*] \
+  MovieRecommendation.jar \
+  hdfs://localhost:9000/user/student/input/ratings.csv \
+  hdfs://localhost:9000/user/student/output/recommendations
 
 # View results
 hdfs dfs -cat /user/student/output/recommendations/user_recommendations/part-*.json
 ```
+
+---
+
+## 10. Conclusion
+
+This lab successfully demonstrated:
+
+1. **Collaborative Filtering** using the ALS matrix factorization algorithm on Spark MLlib
+2. **Hadoop HDFS Integration** — ratings data was loaded from and recommendations saved to HDFS
+3. **Model Training & Evaluation** — the ALS model achieved an RMSE of **0.5522** on the test set,
+   indicating strong prediction accuracy on a 1–5 rating scale
+4. **Recommendation Generation** — top-5 movie recommendations were generated for all 12 users,
+   and top-5 user recommendations were generated for all 38 movies
+5. **Spark DataFrame API** — schema definition, data loading, aggregation, and display operations
+   were used throughout the pipeline
+
+The recommendation system correctly identifies movies with high predicted ratings for each user
+by learning latent features from the collaborative rating patterns in the dataset.

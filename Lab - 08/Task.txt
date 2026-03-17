@@ -1,0 +1,28 @@
+8 Handling and analysing database mongo db
+
+Aim - To perform data handling and analysis operations using MongoDB NoSQL database.
+
+Objectives
+
+Understand document-oriented databases
+
+Perform CRUD operations
+
+Analyze data using MongoDB queries
+
+Software Required
+
+MongoDB
+
+MongoDB Shell or MongoDB Compass
+
+Procedure
+
+Step 1: Start MongoDB
+Step 2: Create Database
+Step 3: Create Collection
+Step 4: Insert Documents
+Step 5: Retrieve Data
+Step 6: Data Analysis Queries
+Step 7: Update Data
+Step 8: Delete Data

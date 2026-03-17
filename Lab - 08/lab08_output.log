@@ -1,0 +1,294 @@
+
+=================================================================
+|             Lab 08 - MongoDB CRUD & Data Analysis             |
+=================================================================
+  Database  : student_db
+  Collection: students
+  Records   : 10 students
+  Driver    : MongoDB Java Driver 3.12
+  [OK]  Connected to MongoDB on localhost:27017
+  -->   Dropped previous collection (if existed)
+
+-----------------------------------------------------------------
+  STEP 1 - INSERT DOCUMENTS
+-----------------------------------------------------------------
+
+  >>  insertOne - first student
+  .............................................................
+  [OK]  Inserted: Amit Kumar
+
+  >>  insertMany - remaining 9 students
+  .............................................................
+  [OK]  Inserted 9 more documents
+  [OK]  Total documents now: 10
+
+-----------------------------------------------------------------
+  STEP 2 - RETRIEVE ALL DOCUMENTS
+-----------------------------------------------------------------
+
+  >>  All students - find()
+  .............................................................
+  +-----+----------------+-------+-------+------------+------+
+  | ID  | Name           | Dept  | Mark  | City       | Yr   |
+  +-----+----------------+-------+-------+------------+------+
+  | 1   | Amit Kumar     | CSE   | 85    | Delhi      | 2    |
+  | 2   | Neha Sharma    | IT    | 90    | Mumbai     | 3    |
+  | 3   | Ravi Verma     | CSE   | 72    | Chennai    | 1    |
+  | 4   | Priya Singh    | ECE   | 88    | Pune       | 2    |
+  | 5   | Arjun Patel    | CSE   | 94    | Ahmedabad  | 3    |
+  | 6   | Sneha Gupta    | IT    | 76    | Delhi      | 2    |
+  | 7   | Karan Mehta    | ECE   | 63    | Mumbai     | 1    |
+  | 8   | Divya Joshi    | CSE   | 91    | Jaipur     | 3    |
+  | 9   | Rohit Das      | IT    | 55    | Kolkata    | 1    |
+  | 10  | Meera Nair     | ECE   | 82    | Kochi      | 2    |
+  +-----+----------------+-------+-------+------------+------+
+  -->   Total: 10 documents
+
+  >>  findOne - search by name: Arjun Patel
+  .............................................................
+     Name       : Arjun Patel
+     Department : CSE
+     Marks      : 94
+     City       : Ahmedabad
+     Year       : 3
+
+  >>  Find all CSE students
+  .............................................................
+     Amit Kumar     : 85
+     Ravi Verma     : 72
+     Arjun Patel    : 94
+     Divya Joshi    : 91
+
+-----------------------------------------------------------------
+  STEP 3 - FILTERED QUERIES
+-----------------------------------------------------------------
+
+  >>  Marks > 80  ($gt operator)
+  .............................................................
+  +----------------+-------+-------+
+  | Name           | Dept  | Marks |
+  +----------------+-------+-------+
+  | Arjun Patel    | CSE   | 94    |
+  | Divya Joshi    | CSE   | 91    |
+  | Neha Sharma    | IT    | 90    |
+  | Priya Singh    | ECE   | 88    |
+  | Amit Kumar     | CSE   | 85    |
+  | Meera Nair     | ECE   | 82    |
+  +----------------+-------+-------+
+  -->   Count: 6 students scored above 80
+
+  >>  Marks < 70  (at-risk students, $lt operator)
+  .............................................................
+  +----------------+-------+-------+
+  | Name           | Dept  | Marks |
+  +----------------+-------+-------+
+  | Karan Mehta    | ECE   | 63    |
+  | Rohit Das      | IT    | 55    |
+  +----------------+-------+-------+
+  -->   Count: 2 at-risk student(s)
+
+  >>  CSE students with marks > 80  (AND filter)
+  .............................................................
+     Amit Kumar     : 85
+     Arjun Patel    : 94
+     Divya Joshi    : 91
+
+  >>  CSE or ECE students  ($or operator)
+  .............................................................
+  +----------------+-------+-------+
+  | Name           | Dept  | Marks |
+  +----------------+-------+-------+
+  | Amit Kumar     | CSE   | 85    |
+  | Ravi Verma     | CSE   | 72    |
+  | Arjun Patel    | CSE   | 94    |
+  | Divya Joshi    | CSE   | 91    |
+  | Priya Singh    | ECE   | 88    |
+  | Karan Mehta    | ECE   | 63    |
+  | Meera Nair     | ECE   | 82    |
+  +----------------+-------+-------+
+
+  >>  CSE or IT students  ($in operator)
+  .............................................................
+     Amit Kumar     | CSE
+     Neha Sharma    | IT
+     Ravi Verma     | CSE
+     Arjun Patel    | CSE
+     Sneha Gupta    | IT
+     Divya Joshi    | CSE
+     Rohit Das      | IT
+
+-----------------------------------------------------------------
+  STEP 4 - SORTING & RANK LIST
+-----------------------------------------------------------------
+
+  >>  All students sorted by marks (descending)
+  .............................................................
+  +----+----------------+-------+-------+
+  | Rk | Name           | Dept  | Marks |
+  +----+----------------+-------+-------+
+  | 1  | Arjun Patel    | CSE   | 94    |
+  | 2  | Divya Joshi    | CSE   | 91    |
+  | 3  | Neha Sharma    | IT    | 90    |
+  | 4  | Priya Singh    | ECE   | 88    |
+  | 5  | Amit Kumar     | CSE   | 85    |
+  | 6  | Meera Nair     | ECE   | 82    |
+  | 7  | Sneha Gupta    | IT    | 76    |
+  | 8  | Ravi Verma     | CSE   | 72    |
+  | 9  | Karan Mehta    | ECE   | 63    |
+  | 10 | Rohit Das      | IT    | 55    |
+  +----+----------------+-------+-------+
+
+  >>  Top 3 performers
+  .............................................................
+     #1  Arjun Patel    - 94/100
+     #2  Divya Joshi    - 91/100
+     #3  Neha Sharma    - 90/100
+
+  >>  Bottom 3 performers
+  .............................................................
+     #1  Rohit Das      - 55/100
+     #2  Karan Mehta    - 63/100
+     #3  Ravi Verma     - 72/100
+
+-----------------------------------------------------------------
+  STEP 5 - DATA ANALYSIS - AGGREGATION PIPELINE
+-----------------------------------------------------------------
+
+  >>  5.1  Overall Statistics
+  .............................................................
+     Total Students : 10
+     Average Marks  : 79.60
+     Highest Marks  : 94
+     Lowest Marks   : 55
+     Total Marks    : 796
+
+  >>  5.2  Department-wise Statistics
+  .............................................................
+  +-------+-------+---------+------+------+
+  | Dept  | Count | Avg     | Max  | Min  |
+  +-------+-------+---------+------+------+
+  | CSE   | 4     | 85.50   | 94   | 72   |
+  | ECE   | 3     | 77.67   | 88   | 63   |
+  | IT    | 3     | 73.67   | 90   | 55   |
+  +-------+-------+---------+------+------+
+
+  >>  5.3  Departments with Average Marks > 75
+  .............................................................
+     CSE    85.50  #################
+     ECE    77.67  ###############
+
+  >>  5.4  Students per Year of Study
+  .............................................................
+     Year 1 (3 students): Ravi Verma, Karan Mehta, Rohit Das
+     Year 2 (4 students): Amit Kumar, Priya Singh, Sneha Gupta, Meera Nair
+     Year 3 (3 students): Neha Sharma, Arjun Patel, Divya Joshi
+
+  >>  5.5  City-wise Student Count
+  .............................................................
+     Mumbai       : ** (2)
+     Delhi        : ** (2)
+     Chennai      : * (1)
+     Ahmedabad    : * (1)
+     Kolkata      : * (1)
+     Pune         : * (1)
+     Jaipur       : * (1)
+     Kochi        : * (1)
+
+-----------------------------------------------------------------
+  STEP 6 - UPDATE DOCUMENTS
+-----------------------------------------------------------------
+
+  >>  6.1  updateOne - Ravi Verma marks: 72 -> 78
+  .............................................................
+  -->   BEFORE : Ravi Verma -> Marks: 72
+  [OK]  matchedCount: 1, modifiedCount: 1
+  -->   AFTER  : Ravi Verma -> Marks: 78  (+6 marks)
+
+  >>  6.2  updateMany - Bonus +5 marks for all IT students
+  .............................................................
+  -->   IT students BEFORE bonus:
+       Neha Sharma   : 90
+       Sneha Gupta   : 76
+       Rohit Das     : 55
+  [OK]  matchedCount: 3  modifiedCount: 3
+  -->   IT students AFTER bonus (+5):
+       Neha Sharma   : 95
+       Sneha Gupta   : 81
+       Rohit Das     : 60
+
+  >>  6.3  Add grade field using updateMany + $set
+  .............................................................
+  [OK]  Grade field assigned to all documents
+  +----------------+-------+-------+-------+
+  | Name           | Dept  | Marks | Grade |
+  +----------------+-------+-------+-------+
+  | Neha Sharma    | IT    | 95    | A     |
+  | Arjun Patel    | CSE   | 94    | A     |
+  | Divya Joshi    | CSE   | 91    | A     |
+  | Priya Singh    | ECE   | 88    | B     |
+  | Amit Kumar     | CSE   | 85    | B     |
+  | Meera Nair     | ECE   | 82    | B     |
+  | Sneha Gupta    | IT    | 81    | B     |
+  | Ravi Verma     | CSE   | 78    | B     |
+  | Karan Mehta    | ECE   | 63    | C     |
+  | Rohit Das      | IT    | 60    | C     |
+  +----------------+-------+-------+-------+
+
+-----------------------------------------------------------------
+  STEP 7 - DELETE DOCUMENTS
+-----------------------------------------------------------------
+  -->   Total before delete: 10
+
+  >>  7.1  deleteOne - Remove Rohit Das (id: 9)
+  .............................................................
+  [OK]  deletedCount: 1
+  -->   Find Rohit Das after delete: null
+  -->   Total after deleteOne: 9
+
+  >>  7.2  deleteMany - Remove all grade D students
+  .............................................................
+  [OK]  deletedCount: 0
+  -->   Total after deleteMany: 9
+
+-----------------------------------------------------------------
+  STEP 8 - INDEXING
+-----------------------------------------------------------------
+
+  >>  8.1  Single-field index on department
+  .............................................................
+  [OK]  Created: department_1
+
+  >>  8.2  Compound index (department ASC, marks DESC)
+  .............................................................
+  [OK]  Created: department_1_marks_-1
+
+  >>  8.3  List all indexes
+  .............................................................
+     _id_                           -> key: Document{{_id=1}}
+     department_1                   -> key: Document{{department=1}}
+     department_1_marks_-1          -> key: Document{{department=1, marks=-1}}
+
+=================================================================
+|               FINAL STATE - Remaining Documents               |
+=================================================================
+  +-----+----------------+-------+------+------+------------+
+  | ID  | Name           | Dept  | Mark | Grd  | City       |
+  +-----+----------------+-------+------+------+------------+
+  | 2   | Neha Sharma    | IT    | 95   | A    | Mumbai     |
+  | 5   | Arjun Patel    | CSE   | 94   | A    | Ahmedabad  |
+  | 8   | Divya Joshi    | CSE   | 91   | A    | Jaipur     |
+  | 4   | Priya Singh    | ECE   | 88   | B    | Pune       |
+  | 1   | Amit Kumar     | CSE   | 85   | B    | Delhi      |
+  | 10  | Meera Nair     | ECE   | 82   | B    | Kochi      |
+  | 6   | Sneha Gupta    | IT    | 81   | B    | Delhi      |
+  | 3   | Ravi Verma     | CSE   | 78   | B    | Chennai    |
+  | 7   | Karan Mehta    | ECE   | 63   | C    | Mumbai     |
+  +-----+----------------+-------+------+------+------------+
+
+  Remaining documents: 9
+
+=================================================================
+|                Lab 08 - Completed Successfully                |
+=================================================================
+  All CRUD + Analysis operations executed cleanly.
+

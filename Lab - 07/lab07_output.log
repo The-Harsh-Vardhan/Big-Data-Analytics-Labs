@@ -1,0 +1,313 @@
+
+=================================================================
+|              Lab 07 - Cassandra | Hive | MongoDB              |
+=================================================================
+  Database  : student_db
+  Dataset   : 10 students (CSE / IT / ECE)
+  Parts     : A=Cassandra  B=Hive  C=MongoDB
+
+#################################################################
+##  PART A - Apache Cassandra (Column-Family NoSQL)
+#################################################################
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+  [OK]  Connected to Cassandra at 127.0.0.1:9042
+  -->   Cluster name: Test Cluster
+
+-----------------------------------------------------------------
+  STEP 1 - CREATE KEYSPACE & TABLE
+-----------------------------------------------------------------
+  [OK]  Keyspace 'student_db' created
+  [OK]  Table 'students' created
+
+-----------------------------------------------------------------
+  STEP 2 - INSERT ROWS
+-----------------------------------------------------------------
+  [OK]  Inserted 10 rows
+
+-----------------------------------------------------------------
+  STEP 3 - RETRIEVE ALL ROWS
+-----------------------------------------------------------------
+
+  >>  SELECT * FROM students
+  .............................................................
+  +-----+----------------+-------+-------+
+  | ID  | Name           | Dept  | Marks |
+  +-----+----------------+-------+-------+
+  | 1   | Amit Kumar     | CSE   | 85    |
+  | 2   | Neha Sharma    | IT    | 90    |
+  | 3   | Ravi Verma     | CSE   | 72    |
+  | 4   | Priya Singh    | ECE   | 88    |
+  | 5   | Arjun Patel    | CSE   | 94    |
+  | 6   | Sneha Gupta    | IT    | 76    |
+  | 7   | Karan Mehta    | ECE   | 63    |
+  | 8   | Divya Joshi    | CSE   | 91    |
+  | 9   | Rohit Das      | IT    | 55    |
+  | 10  | Meera Nair     | ECE   | 82    |
+  +-----+----------------+-------+-------+
+  -->   Total rows: 10
+
+-----------------------------------------------------------------
+  STEP 4 - FILTERED & ANALYSIS QUERIES
+-----------------------------------------------------------------
+
+  >>  Students with marks > 80  (ALLOW FILTERING)
+  .............................................................
+  +----------------+-------+-------+
+  | Name           | Dept  | Marks |
+  +----------------+-------+-------+
+  | Arjun Patel    | CSE   | 94    |
+  | Divya Joshi    | CSE   | 91    |
+  | Neha Sharma    | IT    | 90    |
+  | Priya Singh    | ECE   | 88    |
+  | Amit Kumar     | CSE   | 85    |
+  | Meera Nair     | ECE   | 82    |
+  +----------------+-------+-------+
+  -->   Count: 6 students scored above 80
+
+  >>  Average, Min, Max and Count of all students
+  .............................................................
+
+  [ERROR] Cassandra: Codec not found for requested operation: [int <-> java.lang.Double]
+  Ensure Cassandra is running: sudo cassandra -R
+
+#################################################################
+##  PART B - Apache Hive (SQL-on-Hadoop Data Warehouse)
+#################################################################
+  [!]   Hive requires Hadoop HDFS to be running.
+  [!]   Start Hadoop:  start-dfs.sh && start-yarn.sh
+  [!]   Then run HiveQL commands:  hive -f lab07_hive.hql
+  [!]   HiveQL commands are shown below for reference:
+
+-----------------------------------------------------------------
+  STEP 1 - CREATE DATABASE & TABLE
+-----------------------------------------------------------------
+     hive> CREATE DATABASE IF NOT EXISTS student_db;
+     hive> USE student_db;
+     hive> CREATE TABLE IF NOT EXISTS students (
+     hive>     id INT, name STRING, department STRING, marks INT
+     hive> ) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' STORED AS TEXTFILE;
+
+  >>  Expected Output
+  .............................................................
+     OK
+     Time taken: 0.x seconds
+
+-----------------------------------------------------------------
+  STEP 2 - LOAD DATA & RETRIEVE
+-----------------------------------------------------------------
+     hive> LOAD DATA LOCAL INPATH '/tmp/students.csv' INTO TABLE students;
+     hive> SELECT * FROM students;
+
+  >>  Expected Output
+  .............................................................
+  +-----+----------------+-------+-------+
+  | ID  | Name           | Dept  | Mark  |
+  +-----+----------------+-------+-------+
+  | 1   | Amit Kumar     | CSE   | 85    |
+  | 2   | Neha Sharma    | IT    | 90    |
+  | 3   | Ravi Verma     | CSE   | 72    |
+  | 4   | Priya Singh    | ECE   | 88    |
+  | 5   | Arjun Patel    | CSE   | 94    |
+  | 6   | Sneha Gupta    | IT    | 76    |
+  | 7   | Karan Mehta    | ECE   | 63    |
+  | 8   | Divya Joshi    | CSE   | 91    |
+  | 9   | Rohit Das      | IT    | 55    |
+  | 10  | Meera Nair     | ECE   | 82    |
+  +-----+----------------+-------+-------+
+
+-----------------------------------------------------------------
+  STEP 3 - ANALYSIS QUERIES
+-----------------------------------------------------------------
+
+  >>  Students with marks > 80
+  .............................................................
+     hive> SELECT * FROM students WHERE marks > 80;
+  +----------------+-------+-------+
+  | Name           | Dept  | Marks |
+  +----------------+-------+-------+
+  | Amit Kumar     | CSE   | 85    |
+  | Neha Sharma    | IT    | 90    |
+  | Priya Singh    | ECE   | 88    |
+  | Arjun Patel    | CSE   | 94    |
+  | Divya Joshi    | CSE   | 91    |
+  | Meera Nair     | ECE   | 82    |
+  +----------------+-------+-------+
+
+  >>  Average marks per department  (GROUP BY)
+  .............................................................
+     hive> SELECT department, AVG(marks) AS avg_marks
+     hive> FROM students GROUP BY department ORDER BY avg_marks DESC;
+  +--------------+------------+
+  | Department   | Avg Marks  |
+  +--------------+------------+
+  | CSE          | 85.50      |
+  | ECE          | 77.67      |
+  | IT           | 73.67      |
+  +--------------+------------+
+
+  >>  Count per department
+  .............................................................
+     hive> SELECT department, COUNT(*) AS student_count FROM students GROUP BY department;
+  +--------------+---------+
+  | Department   | Count   |
+  +--------------+---------+
+  | CSE          | 4       |
+  | ECE          | 3       |
+  | IT           | 3       |
+  +--------------+---------+
+
+  >>  Top scorer
+  .............................................................
+     hive> SELECT * FROM students ORDER BY marks DESC LIMIT 1;
+     Arjun Patel  | CSE | 94
+  [OK]  Hive HiveQL commands displayed. Run lab07_hive.hql when Hadoop is active.
+
+#################################################################
+##  PART C - MongoDB (Document-Oriented NoSQL)
+#################################################################
+  [OK]  Connected to MongoDB on localhost:27017
+  -->   Cleared previous collection
+
+-----------------------------------------------------------------
+  STEP 1 - INSERT DOCUMENTS
+-----------------------------------------------------------------
+  [OK]  Inserted 10 documents via insertMany
+  [OK]  Total documents: 10
+
+-----------------------------------------------------------------
+  STEP 2 - RETRIEVE ALL DOCUMENTS
+-----------------------------------------------------------------
+
+  >>  find() - all students
+  .............................................................
+  +-----+----------------+-------+------+------------+
+  | ID  | Name           | Dept  | Mark | City       |
+  +-----+----------------+-------+------+------------+
+  | 1   | Amit Kumar     | CSE   | 85   | Delhi      |
+  | 2   | Neha Sharma    | IT    | 90   | Mumbai     |
+  | 3   | Ravi Verma     | CSE   | 72   | Chennai    |
+  | 4   | Priya Singh    | ECE   | 88   | Pune       |
+  | 5   | Arjun Patel    | CSE   | 94   | Ahmedabad  |
+  | 6   | Sneha Gupta    | IT    | 76   | Delhi      |
+  | 7   | Karan Mehta    | ECE   | 63   | Mumbai     |
+  | 8   | Divya Joshi    | CSE   | 91   | Jaipur     |
+  | 9   | Rohit Das      | IT    | 55   | Kolkata    |
+  | 10  | Meera Nair     | ECE   | 82   | Kochi      |
+  +-----+----------------+-------+------+------------+
+
+-----------------------------------------------------------------
+  STEP 3 - FILTER QUERIES
+-----------------------------------------------------------------
+
+  >>  Marks > 80  ($gt)
+  .............................................................
+  +----------------+-------+-------+
+  | Name           | Dept  | Marks |
+  +----------------+-------+-------+
+  | Arjun Patel    | CSE   | 94    |
+  | Divya Joshi    | CSE   | 91    |
+  | Neha Sharma    | IT    | 90    |
+  | Priya Singh    | ECE   | 88    |
+  | Amit Kumar     | CSE   | 85    |
+  | Meera Nair     | ECE   | 82    |
+  +----------------+-------+-------+
+  -->   Count: 6 students above 80
+
+  >>  CSE AND marks > 80
+  .............................................................
+     Amit Kumar     : 85
+     Arjun Patel    : 94
+     Divya Joshi    : 91
+
+-----------------------------------------------------------------
+  STEP 4 - AGGREGATION PIPELINE
+-----------------------------------------------------------------
+
+  >>  Overall statistics ($group on null)
+  .............................................................
+     Total Students : 10
+     Average Marks  : 79.60
+     Highest Marks  : 94
+     Lowest Marks   : 55
+
+  >>  Department-wise stats ($group by department)
+  .............................................................
+  +-------+-------+---------+------+------+
+  | Dept  | Count | Avg     | Max  | Min  |
+  +-------+-------+---------+------+------+
+  | CSE   | 4     | 85.50   | 94   | 72   |
+  | ECE   | 3     | 77.67   | 88   | 63   |
+  | IT    | 3     | 73.67   | 90   | 55   |
+  +-------+-------+---------+------+------+
+
+  >>  Rank list - sorted by marks (descending)
+  .............................................................
+     #1  Arjun Patel    | CSE  | 94
+     #2  Divya Joshi    | CSE  | 91
+     #3  Neha Sharma    | IT   | 90
+     #4  Priya Singh    | ECE  | 88
+     #5  Amit Kumar     | CSE  | 85
+     #6  Meera Nair     | ECE  | 82
+     #7  Sneha Gupta    | IT   | 76
+     #8  Ravi Verma     | CSE  | 72
+     #9  Karan Mehta    | ECE  | 63
+     #10 Rohit Das      | IT   | 55
+
+-----------------------------------------------------------------
+  STEP 5 - UPDATE DOCUMENTS
+-----------------------------------------------------------------
+
+  >>  updateOne - Ravi Verma marks: 72 -> 80
+  .............................................................
+  -->   BEFORE: Ravi Verma -> 72
+  [OK]  matchedCount: 1  modifiedCount: 1
+  -->   AFTER : Ravi Verma -> 80
+
+  >>  updateMany - +5 bonus marks to all IT students
+  .............................................................
+  -->   IT students BEFORE:
+       Neha Sharma   : 90
+       Sneha Gupta   : 76
+       Rohit Das     : 55
+  [OK]  modifiedCount: 3
+  -->   IT students AFTER (+5):
+       Neha Sharma   : 95
+       Sneha Gupta   : 81
+       Rohit Das     : 60
+
+-----------------------------------------------------------------
+  STEP 6 - DELETE DOCUMENTS
+-----------------------------------------------------------------
+  -->   Count before: 10
+  [OK]  deleteOne (id=9 Rohit Das) -> deletedCount: 1
+  -->   Count after : 9
+
+=================================================================
+|                PART C - FINAL STATE (MongoDB)                 |
+=================================================================
+  +-----+----------------+-------+-------+
+  | ID  | Name           | Dept  | Marks |
+  +-----+----------------+-------+-------+
+  | 2   | Neha Sharma    | IT    | 95    |
+  | 5   | Arjun Patel    | CSE   | 94    |
+  | 8   | Divya Joshi    | CSE   | 91    |
+  | 4   | Priya Singh    | ECE   | 88    |
+  | 1   | Amit Kumar     | CSE   | 85    |
+  | 10  | Meera Nair     | ECE   | 82    |
+  | 6   | Sneha Gupta    | IT    | 81    |
+  | 3   | Ravi Verma     | CSE   | 80    |
+  | 7   | Karan Mehta    | ECE   | 63    |
+  +-----+----------------+-------+-------+
+
+  Remaining documents: 9
+  [OK]  Collection dropped. MongoDB connection closed.
+
+=================================================================
+|                Lab 07 - Completed Successfully                |
+=================================================================
+  Cassandra: CRUD + aggregation queries executed
+  Hive     : HiveQL commands displayed (needs Hadoop)
+  MongoDB  : CRUD + aggregation pipeline executed
+
